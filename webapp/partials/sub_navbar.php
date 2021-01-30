@@ -10,7 +10,7 @@
     <a class="nav-link <?php if ($page=="Explore") {?> active <?}?> " href="Explore.php">Explore</a>
     <a class="nav-link <?php if ($page=="File_server") {?> active <?}?> " href="File_server.php">File Server</a>
     <a class="nav-link <?php if ($page=="Table_pdf") {?> active <?}?> " href="Table_pdf.php">Table to PDF</a>
-    <a class="nav-link" href="#">Link</a>
+    <a class="nav-link <?php if ($page=="Tcpdf") {?> active <?}?> " href="Tcpdf.php">TCPDF</a>
     <a class="nav-link" href="#">Link</a>
     <a class="nav-link" href="#">Link</a>
     <a class="nav-link" href="#">Link</a>
