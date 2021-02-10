@@ -1,4 +1,7 @@
 <?php
+include_once('../../../lib/config.php');
+include_once('../../../lib/function_connect.php');
+include_once('../../../lib/general_functions.php');
 //============================================================+
 // File name   : example_001.php
 // Begin       : 2008-03-04
@@ -38,8 +41,8 @@ $pdf->SetSubject('TCPDF Tutorial');
 $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
 
 // set default header data
-$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 001', PDF_HEADER_STRING, array(0,64,255), array(0,64,128));
-$pdf->setFooterData(array(0,64,0), array(0,64,128));
+//$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 001', PDF_HEADER_STRING, array(0,64,255), array(0,64,128));
+//$pdf->setFooterData(array(0,64,0), array(0,64,128));
 
 // set header and footer fonts
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -74,7 +77,7 @@ $pdf->setFontSubsetting(true);
 // dejavusans is a UTF-8 Unicode font, if you only need to
 // print standard ASCII chars, you can use core fonts like
 // helvetica or times to reduce file size.
-$pdf->SetFont('dejavusans', '', 14, '', true);
+$pdf->SetFont('dejavusans', '', 8, '', true);
 
 // Add a page
 // This method has several options, check the source code documentation for more information.
@@ -82,39 +85,38 @@ $pdf->AddPage();
 
 // set text shadow effect
 $pdf->setTextShadow(array('enabled'=>true, 'depth_w'=>0.2, 'depth_h'=>0.2, 'color'=>array(196,196,196), 'opacity'=>1, 'blend_mode'=>'Normal'));
+$prdcode = 'ABZ';
+$subcode = 5;
 
+$prd_rate = select_query_json("select * from NON_RATE_COMPARISON where prdcode = '".$prdcode."' and subcode = '".$subcode."'","Centra","TEST");
 // Set some content to print
-$html = <<<EOD
-<table width="100%">
-                  <tr>
-                    <td>
-                    <table cellpadding="5" border="1"  style="font-size:8px !important">  
-                    <thead>
-                     <tr bgcolor="#fcc837" color="#000" valign="center">
-                       <td align="center" valign="center" style="border: 1px solid #000;font-weight:bold;" width="5%">S.No</td>
-                       <td align="center" style="border: 1px solid #000;font-weight:bold" width="10%">VALUE DT(M)</td>
-                       <td align="center" style="border: 1px solid #000;font-weight:bold" width="10%">PO YEAR: PO NUMBER</td>
-                       <td align="center" style="border: 1px solid #000;font-weight:bold" width="15%">BENEFICIARY BRANCH IFSC(M)</td>
-                       <td align="center" style="border: 1px solid #000;font-weight:bold" width="15%">BENEFICIARY CUSTOMER ACCOUNT NUMBER(M)</td>
-                       <td align="center" style="border: 1px solid #000;font-weight:bold" width="20%">BENEFICIARY CUSTOMER ACCOUNT NAME(M)</td>
-                       <td align="center" style="border: 1px solid #000;font-weight:bold" width="15%">BENEFICIARY CUSTOMER BANK NAME(M)</td>  
-                       <td align="center"style="border: 1px solid #000;font-weight:bold" width="10%">AMOUNT(M)</td> 
-                     </tr>
-                   </thead>
-                   <tbody>
-EOD;
-$html. = <<<EOD
-<tr style="border-bottom-right-radius: 10px">
-                       <td style="border: 1px solid #000;font-weight:bold" width="5%">'.$t.'</td>
-                       <td style="border: 1px solid #000;font-weight:bold" width="10%">'.$_SESSION['trnnumb'][$i][0].'</td>
-                       <td style="border: 1px solid #000;font-weight:bold" width=10%">'.$_SESSION['data'][$i][22].'</td>
-                       <td style="border: 1px solid #000;font-weight:bold" width="15%">'.$_SESSION['data'][$i][24].'</td>
-                       <td style="border: 1px solid #000;font-weight:bold" width="15%">'.$_SESSION['data'][$i][2].' </td>
-                       <td style="border: 1px solid #000;font-weight:bold" width="20%">'.$_SESSION['data'][$i][4].' </td>
-                       <td style="border: 1px solid #000;font-weight:bold" width="15%">'.$_SESSION['data'][$i][25].'</td>
-                       <td style="border: 1px solid #000;font-weight:bold" width="10%" align="right">'.$amt.'</td>
-                     </tr>
-EOD;
+$html = '<table style="border-collapse: collapse; border: 1px solid black;font-size:8px">
+      <thead>
+        <tr>
+        <th style="height:20px;text-align:center;border: 1px solid black;width:8%">BRANCH </th>
+        <th style="height:20px;text-align:center;border: 1px solid black;width:20%">PRODUCT</th>
+        <th style="height:20px;text-align:center;border: 1px solid black;width:20%">SUB-PRODUCT</th>
+        <th style="height:20px;text-align:center;border: 1px solid black;width:8%">RATE</th>
+        <th style="height:20px;text-align:center;border: 1px solid black;width:44%">APPROVAL NO</th>
+        </tr>
+       
+      </thead>
+      <tbody>';
+      foreach ($prd_rate as $key => $value) {
+      
+        $html .='<tr>
+          <td style="border: 1px solid black;width:8%">'.$value["BRNCODE"].'</td>
+          <td style="border: 1px solid black;width:20%">'.$value["PRDCODE"].' </td>
+          <td style="border: 1px solid black;width:20%">'.$value["SUBCODE"].' </td>
+          <td style="border: 1px solid black;width:8%">'.$value["PRDRATE"].'</td>
+          <td style="border: 1px solid black;width:44%">'.$value["APRNUMB"].'</td>
+        </tr>';
+      }
+        
+         
+       $html .=' </tbody>        
+                </table>';
+
 
 // Print text using writeHTMLCell()
 $pdf->writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
@@ -123,7 +125,34 @@ $pdf->writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
 
 // Close and output PDF document
 // This method has several options, check the source code documentation for more information.
-$pdf->Output('example_001.pdf', 'I');
+//1312_16_1_2020-21_fieldimpl_p_2
+$file_Name = 'product_2.pdf';
+$pdf->Output(__DIR__ . '/uploads/'.$file_Name, 'F'); // I for inline pdf view / F for Save File
+
+
+              $local_file = __DIR__ . '/uploads/'.$file_Name;
+              $server_file = 'approval_desk/request_entry/non_product/'.$file_Name;
+
+              // Approval Documents
+              $attch = select_query_json("select nvl(max(APDCSRN),0)+1 MAXSRNO from APPROVAL_REQUEST_DOCS where APRNUMB = '".$apprno."'","Centra","TCS");
+              $tbl_docs = "APPROVAL_REQUEST_DOCS";
+              $field_docs['APRNUMB'] = $apprno;
+              $field_docs['APDCSRN'] = $attch[0]['MAXSRNO'];
+              $field_docs['APRDOCS'] = $file_Name;
+              $field_docs['APRHEAD'] = 'non_product';
+              $field_docs['DOCSTAT'] = 'N';
+              $field_docs['ARQSRNO'] = 1;
+              // print_r($field_docs);
+              // Approval Documents
+
+              if ((!$conn_id) || (!$login_result)) {
+                $upload = ftp_put($ftp_conn, $server_file, $local_file, FTP_BINARY);
+                // echo "<br>lar Succes";
+                //unlink($local_file);
+              }
+              if ($upload) {
+               // $insert_docs = insert_dbquery($field_docs, $tbl_docs);
+              }
 
 //============================================================+
 // END OF FILE
